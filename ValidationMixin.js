@@ -25,14 +25,22 @@ var ValidationMixin = {
    * @param {String|Function} key to validate, or error-first containing the validation errors if any.
    * @param {?Function} error-first callback containing the validation errors if any.
    */
-  validate: function(key, callback) {
+  validate: function(key, callback, options) {
+    options = options || {};
+
+    if (this.validatorLanguage) {
+      options = Object.assign(options, {
+        language: this.validatorLanguage
+      });
+    }
+
     if (typeof key === 'function') {
       callback = key;
       key = undefined;
     }
     var schema = result(this, 'validatorTypes') || {};
     var data = result(this, 'getValidatorData') || this.state;
-    var validationErrors = Object.assign({}, this.state.errors, ValidationFactory.validate(schema, data, key));
+    var validationErrors = Object.assign({}, this.state.errors, ValidationFactory.validate(schema, data, key, options));
     this.setState({
       errors: validationErrors
     }, this._invokeCallback.bind(this, key, callback));
